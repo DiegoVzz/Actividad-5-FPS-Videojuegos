@@ -12,6 +12,11 @@ public class FlyingEnemy : MonoBehaviour
     private int currentWaypointIndex = 0;
     private bool isForward = true;
 
+    void Start()
+    {
+        transform.rotation = Quaternion.Euler(0, 90, 0);
+    }
+
     void Update()
     {
         if (waypoints.Count == 0) return;
@@ -29,12 +34,17 @@ public class FlyingEnemy : MonoBehaviour
     {
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, flightSpeed * Time.deltaTime);
 
-        // Rotación suave hacia el objetivo
+        // Rotación corregida
         Vector3 direction = (targetPosition - transform.position).normalized;
         if (direction != Vector3.zero)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+            // Añade una compensación de -90° en el eje X
+            Quaternion targetRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRotation,
+                Time.deltaTime * 5f
+            );
         }
     }
 
